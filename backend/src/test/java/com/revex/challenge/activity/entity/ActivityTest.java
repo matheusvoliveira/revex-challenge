@@ -79,6 +79,19 @@ class ActivityTest {
                 .hasMessage("Não é possível concluir uma atividade já concluída.");
     }
 
+    @Test
+    void updateDescription_onCompletedKeepsStatusAndCollaborator() {
+        Collaborator owner = collaborator();
+        Activity activity = Activity.create("Texto antigo", owner);
+        activity.complete();
+
+        activity.updateDescription("Texto novo");
+
+        assertThat(activity.getDescription()).isEqualTo("Texto novo");
+        assertThat(activity.getStatus()).isEqualTo(ActivityStatus.CONCLUIDA);
+        assertThat(activity.getCollaborator()).isSameAs(owner);
+    }
+
     private static Collaborator collaborator() {
         return Collaborator.create(
                 "Ana Silva",

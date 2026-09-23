@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -149,6 +150,75 @@ class ActivityApiIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Atividade não encontrada."));
 
         mockMvc.perform(patch("/api/activities/{id}/complete", missing))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Atividade não encontrada."));
+    }
+
+    @Test
+    void updateDescription_changesTextAndKeepsStatusAndCollaborator() throws Exception {
+        UUID collaboratorId = createCollaborator("Ana Edit");
+        UUID activityId = createActivity("Texto antigo", collaboratorId);
+
+        mockMvc.perform(patch("/api/activities/{id}", activityId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("description", "Texto novo"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description").value("Texto novo"))
+                .andExpect(jsonPath("$.status").value("PENDENTE"))
+                .andExpect(jsonPath("$.collaborator.id").value(collaboratorId.toString()));
+    }
+
+    @Test
+    void updateDescription_onCompletedKeepsCompleted() throws Exception {
+        UUID collaboratorId = createCollaborator("Ana Done Edit");
+        UUID activityId = createActivity("Fechada", collaboratorId);
+        mockMvc.perform(patch("/api/activities/{id}/complete", activityId))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(patch("/api/activities/{id}", activityId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("description", "Ainda fechada"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description").value("Ainda fechada"))
+                .andExpect(jsonPath("$.status").value("CONCLUIDA"))
+                .andExpect(jsonPath("$.collaborator.id").value(collaboratorId.toString()));
+    }
+
+    @Test
+    void updateDescription_rejectsBlankAndForbiddenFields() throws Exception {
+        UUID collaboratorId = createCollaborator("Ana Guard");
+        UUID activityId = createActivity("Original", collaboratorId);
+
+        mockMvc.perform(patch("/api/activities/{id}", activityId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("description", "   "))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("description"));
+
+        Map<String, Object> withStatus = new HashMap<>();
+        withStatus.put("description", "Tentativa");
+        withStatus.put("status", "CONCLUIDA");
+        mockMvc.perform(patch("/api/activities/{id}", activityId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(withStatus)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Só é permitido alterar a descrição."));
+
+        Map<String, Object> withCollaborator = new HashMap<>();
+        withCollaborator.put("description", "Tentativa");
+        withCollaborator.put("collaboratorId", UUID.randomUUID().toString());
+        mockMvc.perform(patch("/api/activities/{id}", activityId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(withCollaborator)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Só é permitido alterar a descrição."));
+    }
+
+    @Test
+    void updateDescription_returns404WhenMissing() throws Exception {
+        mockMvc.perform(patch("/api/activities/{id}", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("description", "Nada"))))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Atividade não encontrada."));
     }

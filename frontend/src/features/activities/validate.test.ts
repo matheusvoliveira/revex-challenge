@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { validateActivityForm } from './validate'
+import { validateActivityDescription, validateActivityForm } from './validate'
 
 describe('validateActivityForm', () => {
   it('requires description and collaborator', () => {
@@ -28,5 +28,10 @@ describe('validateActivityForm', () => {
     })
 
     expect(errors).toEqual({})
+  })
+
+  it('validates description alone for inline edit', () => {
+    expect(validateActivityDescription('   ')).toBe('Descrição é obrigatória.')
+    expect(validateActivityDescription('Atualizar texto')).toBeNull()
   })
 })
