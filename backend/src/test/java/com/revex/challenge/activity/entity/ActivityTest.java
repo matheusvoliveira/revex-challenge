@@ -13,7 +13,7 @@ class ActivityTest {
 
     @Test
     void create_startsPending() {
-        Activity activity = Activity.create("Preparar relatório", collaborator());
+        Activity activity = Activity.create("Título", "Preparar relatório", collaborator());
 
         assertThat(activity.getId()).isNotNull();
         assertThat(activity.getStatus()).isEqualTo(ActivityStatus.PENDENTE);
@@ -23,7 +23,7 @@ class ActivityTest {
 
     @Test
     void start_movesPendingToInProgress() {
-        Activity activity = Activity.create("Preparar relatório", collaborator());
+        Activity activity = Activity.create("Título", "Preparar relatório", collaborator());
 
         activity.start();
 
@@ -32,7 +32,7 @@ class ActivityTest {
 
     @Test
     void start_rejectsWhenAlreadyInProgress() {
-        Activity activity = Activity.create("Preparar relatório", collaborator());
+        Activity activity = Activity.create("Título", "Preparar relatório", collaborator());
         activity.start();
 
         assertThatThrownBy(activity::start)
@@ -42,7 +42,7 @@ class ActivityTest {
 
     @Test
     void start_rejectsWhenCompleted() {
-        Activity activity = Activity.create("Preparar relatório", collaborator());
+        Activity activity = Activity.create("Título", "Preparar relatório", collaborator());
         activity.complete();
 
         assertThatThrownBy(activity::start)
@@ -52,7 +52,7 @@ class ActivityTest {
 
     @Test
     void complete_fromPending() {
-        Activity activity = Activity.create("Preparar relatório", collaborator());
+        Activity activity = Activity.create("Título", "Preparar relatório", collaborator());
 
         activity.complete();
 
@@ -61,7 +61,7 @@ class ActivityTest {
 
     @Test
     void complete_fromInProgress() {
-        Activity activity = Activity.create("Preparar relatório", collaborator());
+        Activity activity = Activity.create("Título", "Preparar relatório", collaborator());
         activity.start();
 
         activity.complete();
@@ -71,7 +71,7 @@ class ActivityTest {
 
     @Test
     void complete_rejectsSecondConclusion() {
-        Activity activity = Activity.create("Preparar relatório", collaborator());
+        Activity activity = Activity.create("Título", "Preparar relatório", collaborator());
         activity.complete();
 
         assertThatThrownBy(activity::complete)
@@ -82,7 +82,7 @@ class ActivityTest {
     @Test
     void updateDescription_onCompletedKeepsStatusAndCollaborator() {
         Collaborator owner = collaborator();
-        Activity activity = Activity.create("Texto antigo", owner);
+        Activity activity = Activity.create("Título", "Texto antigo", owner);
         activity.complete();
 
         activity.updateDescription("Texto novo");

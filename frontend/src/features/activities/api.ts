@@ -3,6 +3,7 @@ import type { PageResponse } from '../collaborators/types'
 import type { Activity, ActivityStatus } from './types'
 
 export type CreateActivityPayload = {
+  title: string
   description: string
   collaboratorId: string
 }
@@ -40,9 +41,12 @@ export function completeActivity(id: string): Promise<Activity> {
   return apiRequest<Activity>(`/api/activities/${id}/complete`, { method: 'PATCH' })
 }
 
-export function updateActivity(id: string, description: string): Promise<Activity> {
+export function updateActivity(
+  id: string,
+  payload: { title?: string; description?: string }
+): Promise<Activity> {
   return apiRequest<Activity>(`/api/activities/${id}`, {
     method: 'PATCH',
-    body: JSON.stringify({ description }),
+    body: JSON.stringify(payload),
   })
 }

@@ -1,13 +1,23 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
 import { ApiError } from '../../shared/api/client'
+import { Banner } from '../../shared/ui/Banner'
+import { Badge } from '../../shared/ui/Badge'
+import { statusTone } from '../../shared/ui/statusTone'
+import { Button } from '../../shared/ui/Button'
+import { EmptyState } from '../../shared/ui/EmptyState'
+import { PageHeader } from '../../shared/ui/PageHeader'
+import { SelectField } from '../../shared/ui/SelectField'
+import { StatusText } from '../../shared/ui/StatusText'
+import { Table } from '../../shared/ui/Table'
+import { TextField } from '../../shared/ui/TextField'
 import { listCollaborators } from '../collaborators/api'
 import type { CollaboratorSummary } from '../collaborators/types'
 import { completeActivity, listActivities, startActivity, updateActivity } from './api'
 import { ACTIVITY_STATUSES, canComplete, canStart, statusLabel } from './status'
 import type { Activity, ActivityStatus } from './types'
-import { validateActivityDescription } from './validate'
+import { validateActivityDescription, validateActivityTitle } from './validate'
 import styles from './activities.module.css'
+import ui from '../../shared/ui/ui.module.css'
 
 export function ActivityListPage() {
   const [collaboratorId, setCollaboratorId] = useState('')
@@ -20,8 +30,10 @@ export function ActivityListPage() {
   const [actionError, setActionError] = useState<string | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [draftTitle, setDraftTitle] = useState('')
   const [draft, setDraft] = useState('')
   const [editError, setEditError] = useState<string | null>(null)
+  const [titleError, setTitleError] = useState<string | null>(null)
   const [collaborators, setCollaborators] = useState<CollaboratorSummary[]>([])
   const requestKey = `${appliedCollaboratorId}\0${appliedStatus}\0${reloadKey}`
   const [activeKey, setActiveKey] = useState(requestKey)
@@ -33,6 +45,7 @@ export function ActivityListPage() {
     setActionError(null)
     setEditingId(null)
     setEditError(null)
+    setTitleError(null)
   }
 
   useEffect(() => {
@@ -104,21 +117,28 @@ export function ActivityListPage() {
 
   function beginEdit(item: Activity) {
     setEditingId(item.id)
+    setDraftTitle(item.title)
     setDraft(item.description)
     setEditError(null)
+    setTitleError(null)
     setActionError(null)
   }
 
   async function saveEdit(id: string) {
+    const nextTitleError = validateActivityTitle(draftTitle)
     const descriptionError = validateActivityDescription(draft)
-    if (descriptionError) {
-      setEditError(descriptionError)
+    setTitleError(nextTitleError)
+    setEditError(descriptionError)
+    if (nextTitleError || descriptionError) {
       return
     }
     setBusyId(id)
     setActionError(null)
     try {
-      const updated = await updateActivity(id, draft.trim())
+      const updated = await updateActivity(id, {
+        title: draftTitle.trim(),
+        description: draft.trim(),
+      })
       setItems((current) =>
         current?.map((item) => (item.id === updated.id ? updated : item)) ?? current
       )
@@ -139,44 +159,43 @@ export function ActivityListPage() {
 
   return (
     <section>
-      <div className={styles.headerRow}>
-        <h1>Atividades</h1>
-        <Link className={styles.primaryLink} to="/activities/new">
-          Nova atividade
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Operação"
+        title="Atividades"
+        description="Acompanhe o ciclo pendente, em andamento e concluída."
+        action={<Button to="/activities/new">Nova atividade</Button>}
+      />
 
       <form className={styles.filter} onSubmit={handleFilter}>
-        <label>
-          Colaborador
-          <select value={collaboratorId} onChange={(event) => setCollaboratorId(event.target.value)}>
-            <option value="">Todos</option>
-            {collaborators.map((collaborator) => (
-              <option key={collaborator.id} value={collaborator.id}>
-                {collaborator.fullName}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Status
-          <select
-            value={status}
-            onChange={(event) => setStatus(event.target.value as ActivityStatus | '')}
-          >
-            <option value="">Todos</option>
-            {ACTIVITY_STATUSES.map((item) => (
-              <option key={item} value={item}>
-                {statusLabel(item)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button type="submit">Filtrar</button>
+        <SelectField
+          label="Colaborador"
+          value={collaboratorId}
+          onChange={(event) => setCollaboratorId(event.target.value)}
+        >
+          <option value="">Todos</option>
+          {collaborators.map((collaborator) => (
+            <option key={collaborator.id} value={collaborator.id}>
+              {collaborator.fullName}
+            </option>
+          ))}
+        </SelectField>
+        <SelectField
+          label="Status"
+          value={status}
+          onChange={(event) => setStatus(event.target.value as ActivityStatus | '')}
+        >
+          <option value="">Todos</option>
+          {ACTIVITY_STATUSES.map((item) => (
+            <option key={item} value={item}>
+              {statusLabel(item)}
+            </option>
+          ))}
+        </SelectField>
+        <Button type="submit">Filtrar</Button>
         {hasFilter ? (
-          <button
+          <Button
             type="button"
-            className={styles.secondary}
+            variant="secondary"
             onClick={() => {
               setCollaboratorId('')
               setStatus('')
@@ -185,28 +204,33 @@ export function ActivityListPage() {
             }}
           >
             Limpar
-          </button>
+          </Button>
         ) : null}
       </form>
 
-      {loading ? <p className={styles.status}>Carregando...</p> : null}
+      {loading ? <StatusText>Carregando...</StatusText> : null}
       {error ? (
-        <p className={styles.bannerError}>
+        <Banner>
           {error}{' '}
-          <button type="button" onClick={() => setReloadKey((key) => key + 1)}>
+          <Button type="button" variant="secondary" onClick={() => setReloadKey((key) => key + 1)}>
             Tentar novamente
-          </button>
-        </p>
+          </Button>
+        </Banner>
       ) : null}
-      {actionError ? <p className={styles.bannerError}>{actionError}</p> : null}
+      {actionError ? <Banner>{actionError}</Banner> : null}
       {!loading && !error && items?.length === 0 ? (
-        <p className={styles.status}>Nenhuma atividade cadastrada.</p>
+        <EmptyState
+          title="Nenhuma atividade cadastrada."
+          description="Crie uma atividade para um colaborador existente."
+          action={<Button to="/activities/new" variant="secondary">Nova atividade</Button>}
+        />
       ) : null}
 
       {!loading && !error && items && items.length > 0 ? (
-        <table className={styles.table}>
+        <Table>
           <thead>
             <tr>
+              <th>Título</th>
               <th>Descrição</th>
               <th>Colaborador</th>
               <th>Status</th>
@@ -218,83 +242,97 @@ export function ActivityListPage() {
               <tr key={item.id}>
                 <td>
                   {editingId === item.id ? (
-                    <div className={styles.editBox}>
-                      <textarea
-                        value={draft}
-                        maxLength={2000}
-                        rows={3}
-                        onChange={(event) => setDraft(event.target.value)}
-                      />
-                      {editError ? <span className={styles.fieldError}>{editError}</span> : null}
-                    </div>
+                    <TextField
+                      label="Título"
+                      value={draftTitle}
+                      maxLength={100}
+                      onChange={(event) => setDraftTitle(event.target.value)}
+                      error={titleError ?? undefined}
+                    />
+                  ) : (
+                    item.title
+                  )}
+                </td>
+                <td>
+                  {editingId === item.id ? (
+                    <TextField
+                      label="Descrição"
+                      multiline
+                      value={draft}
+                      maxLength={1000}
+                      rows={3}
+                      onChange={(event) => setDraft(event.target.value)}
+                      error={editError ?? undefined}
+                    />
                   ) : (
                     item.description
                   )}
                 </td>
                 <td>{item.collaborator.fullName}</td>
                 <td>
-                  <span className={`${styles.badge} ${styles[item.status]}`}>
-                    {statusLabel(item.status)}
-                  </span>
+                  <Badge tone={statusTone(item.status)}>{statusLabel(item.status)}</Badge>
                 </td>
-                <td className={styles.actions}>
-                  {editingId === item.id ? (
-                    <>
-                      <button
-                        type="button"
-                        disabled={busyId === item.id}
-                        onClick={() => void saveEdit(item.id)}
-                      >
-                        {busyId === item.id ? 'Salvando...' : 'Salvar'}
-                      </button>
-                      <button
-                        type="button"
-                        className={styles.secondary}
-                        disabled={busyId === item.id}
-                        onClick={() => {
-                          setEditingId(null)
-                          setEditError(null)
-                        }}
-                      >
-                        Cancelar
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        type="button"
-                        className={styles.secondary}
-                        disabled={busyId === item.id}
-                        onClick={() => beginEdit(item)}
-                      >
-                        Editar
-                      </button>
-                      {canStart(item.status) ? (
-                        <button
+                <td>
+                  <div className={ui.actions}>
+                    {editingId === item.id ? (
+                      <>
+                        <Button
                           type="button"
                           disabled={busyId === item.id}
-                          onClick={() => void runAction(item.id, 'start')}
+                          onClick={() => void saveEdit(item.id)}
                         >
-                          {busyId === item.id ? 'Atualizando...' : 'Iniciar'}
-                        </button>
-                      ) : null}
-                      {canComplete(item.status) ? (
-                        <button
+                          {busyId === item.id ? 'Salvando...' : 'Salvar'}
+                        </Button>
+                        <Button
                           type="button"
-                          className={styles.secondary}
+                          variant="secondary"
                           disabled={busyId === item.id}
-                          onClick={() => void runAction(item.id, 'complete')}
+                          onClick={() => {
+                            setEditingId(null)
+                            setEditError(null)
+                            setTitleError(null)
+                          }}
                         >
-                          {busyId === item.id ? 'Atualizando...' : 'Concluir'}
-                        </button>
-                      ) : null}
-                    </>
-                  )}
+                          Cancelar
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          disabled={busyId === item.id}
+                          onClick={() => beginEdit(item)}
+                        >
+                          Editar
+                        </Button>
+                        {canStart(item.status) ? (
+                          <Button
+                            type="button"
+                            disabled={busyId === item.id}
+                            onClick={() => void runAction(item.id, 'start')}
+                          >
+                            {busyId === item.id ? 'Atualizando...' : 'Iniciar'}
+                          </Button>
+                        ) : null}
+                        {canComplete(item.status) ? (
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            disabled={busyId === item.id}
+                            onClick={() => void runAction(item.id, 'complete')}
+                          >
+                            {busyId === item.id ? 'Atualizando...' : 'Concluir'}
+                          </Button>
+                        ) : null}
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
-        </table>
+        </Table>
       ) : null}
     </section>
   )

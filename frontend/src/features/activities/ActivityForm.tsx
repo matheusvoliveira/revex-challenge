@@ -1,6 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
 import { ApiError } from '../../shared/api/client'
+import { Banner } from '../../shared/ui/Banner'
+import { Button } from '../../shared/ui/Button'
+import { Card } from '../../shared/ui/Card'
+import { SelectField } from '../../shared/ui/SelectField'
+import { TextField } from '../../shared/ui/TextField'
 import { listCollaborators } from '../collaborators/api'
 import type { CollaboratorSummary } from '../collaborators/types'
 import { createActivity } from './api'
@@ -13,6 +17,7 @@ type Props = {
 }
 
 const emptyValues: ActivityFormValues = {
+  title: '',
   description: '',
   collaboratorId: '',
 }
@@ -64,6 +69,7 @@ export function ActivityForm({ onCreated }: Props) {
     setSubmitting(true)
     try {
       await createActivity({
+        title: values.title.trim(),
         description: values.description.trim(),
         collaboratorId: values.collaboratorId,
       })
@@ -73,7 +79,7 @@ export function ActivityForm({ onCreated }: Props) {
       if (error instanceof ApiError) {
         const mapped: ActivityFormErrors = {}
         for (const fieldError of error.fieldErrors) {
-          if (fieldError.field === 'description' || fieldError.field === 'collaboratorId') {
+          if (fieldError.field === 'title' || fieldError.field === 'description' || fieldError.field === 'collaboratorId') {
             mapped[fieldError.field] = fieldError.message
           }
         }
@@ -91,24 +97,30 @@ export function ActivityForm({ onCreated }: Props) {
   const hasCollaborators = (collaborators?.length ?? 0) > 0
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit} noValidate>
-      <label className={styles.field}>
-        Descrição
-        <textarea
+    <Card>
+      <form className={styles.form} onSubmit={handleSubmit} noValidate>
+        <TextField
+          label="Título"
+          value={values.title}
+          maxLength={100}
+          onChange={(event) => update('title', event.target.value)}
+          error={errors.title}
+        />
+        <TextField
+          label="Descrição"
+          multiline
           value={values.description}
-          maxLength={2000}
+          maxLength={1000}
           rows={4}
           onChange={(event) => update('description', event.target.value)}
+          error={errors.description}
         />
-        {errors.description ? <span className={styles.fieldError}>{errors.description}</span> : null}
-      </label>
-
-      <label className={styles.field}>
-        Colaborador
-        <select
+        <SelectField
+          label="Colaborador"
           value={values.collaboratorId}
           disabled={loadingOptions || !hasCollaborators}
           onChange={(event) => update('collaboratorId', event.target.value)}
+          error={errors.collaboratorId}
         >
           <option value="">
             {loadingOptions ? 'Carregando colaboradores...' : 'Selecione um colaborador'}
@@ -118,21 +130,19 @@ export function ActivityForm({ onCreated }: Props) {
               {collaborator.fullName}
             </option>
           ))}
-        </select>
-        {errors.collaboratorId ? <span className={styles.fieldError}>{errors.collaboratorId}</span> : null}
-      </label>
-
-      {optionsError ? <p className={styles.bannerError}>{optionsError}</p> : null}
-      {!loadingOptions && !optionsError && !hasCollaborators ? (
-        <p className={styles.hint}>
-          Cadastre um <Link to="/collaborators/new">colaborador</Link> antes de criar atividades.
-        </p>
-      ) : null}
-      {submitError ? <p className={styles.bannerError}>{submitError}</p> : null}
-
-      <button type="submit" disabled={submitting || !hasCollaborators}>
-        {submitting ? 'Salvando...' : 'Cadastrar atividade'}
-      </button>
-    </form>
+        </SelectField>
+        {optionsError ? <Banner>{optionsError}</Banner> : null}
+        {!loadingOptions && !optionsError && !hasCollaborators ? (
+          <Banner tone="info">
+            Cadastre um colaborador antes de criar atividades.{' '}
+            <Button to="/collaborators/new" variant="ghost">Novo colaborador</Button>
+          </Banner>
+        ) : null}
+        {submitError ? <Banner>{submitError}</Banner> : null}
+        <Button type="submit" disabled={submitting || !hasCollaborators}>
+          {submitting ? 'Salvando...' : 'Cadastrar atividade'}
+        </Button>
+      </form>
+    </Card>
   )
 }

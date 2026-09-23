@@ -21,6 +21,9 @@ public class Activity {
     @Id
     private UUID id;
 
+    @Column(nullable = false, length = 100)
+    private String title;
+
     @Column(nullable = false, length = 2000)
     private String description;
 
@@ -39,9 +42,10 @@ public class Activity {
         // JPA
     }
 
-    public static Activity create(String description, Collaborator collaborator) {
+    public static Activity create(String title, String description, Collaborator collaborator) {
         Activity activity = new Activity();
         activity.id = UUID.randomUUID();
+        activity.title = title;
         activity.description = description;
         activity.collaborator = collaborator;
         activity.status = ActivityStatus.PENDENTE;
@@ -63,12 +67,20 @@ public class Activity {
         this.status = ActivityStatus.CONCLUIDA;
     }
 
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
     public void updateDescription(String description) {
         this.description = description;
     }
 
     public UUID getId() {
         return id;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public String getDescription() {

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@WithMockUser(username = "revex")
 class ActivityApiIntegrationTest {
 
     @Autowired
@@ -43,6 +45,7 @@ class ActivityApiIntegrationTest {
                         .content(objectMapper.writeValueAsString(activityBody("Revisar contrato", collaboratorId))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.title").value("Revisar contrato"))
                 .andExpect(jsonPath("$.description").value("Revisar contrato"))
                 .andExpect(jsonPath("$.status").value("PENDENTE"))
                 .andExpect(jsonPath("$.collaborator.id").value(collaboratorId.toString()))
@@ -202,7 +205,7 @@ class ActivityApiIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(withStatus)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Só é permitido alterar a descrição."));
+                .andExpect(jsonPath("$.message").value("Só é permitido alterar título e descrição."));
 
         Map<String, Object> withCollaborator = new HashMap<>();
         withCollaborator.put("description", "Tentativa");
@@ -211,7 +214,7 @@ class ActivityApiIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(withCollaborator)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Só é permitido alterar a descrição."));
+                .andExpect(jsonPath("$.message").value("Só é permitido alterar título e descrição."));
     }
 
     @Test
@@ -250,9 +253,13 @@ class ActivityApiIntegrationTest {
     }
 
     private Map<String, Object> activityBody(String description, UUID collaboratorId) {
-        return Map.of(
-                "description", description,
-                "collaboratorId", collaboratorId.toString()
-        );
+        String title = description.trim().isEmpty()
+                ? "Título"
+                : description.substring(0, Math.min(description.length(), 100));
+        Map<String, Object> body = new HashMap<>();
+        body.put("title", title);
+        body.put("description", description);
+        body.put("collaboratorId", collaboratorId.toString());
+        return body;
     }
 }

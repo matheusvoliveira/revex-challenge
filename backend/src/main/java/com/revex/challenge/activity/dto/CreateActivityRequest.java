@@ -6,8 +6,12 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 
 public record CreateActivityRequest(
+        @NotBlank(message = "Título é obrigatório.")
+        @Size(max = 100, message = "Título excede o limite de 100 caracteres.")
+        String title,
+
         @NotBlank(message = "Descrição é obrigatória.")
-        @Size(max = 2000, message = "Descrição excede o limite técnico de 2000 caracteres.")
+        @Size(max = 1000, message = "Descrição excede o limite de 1000 caracteres.")
         String description,
 
         @NotNull(message = "Colaborador é obrigatório.")

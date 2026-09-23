@@ -7,6 +7,7 @@ export type ActivityCollaborator = {
 
 export type Activity = {
   id: string
+  title: string
   description: string
   status: ActivityStatus
   collaborator: ActivityCollaborator
@@ -14,6 +15,7 @@ export type Activity = {
 }
 
 export type ActivityFormValues = {
+  title: string
   description: string
   collaboratorId: string
 }

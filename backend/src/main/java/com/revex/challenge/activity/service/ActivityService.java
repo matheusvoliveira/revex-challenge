@@ -33,7 +33,7 @@ public class ActivityService {
     @Transactional
     public ActivityResponse create(CreateActivityRequest request) {
         Collaborator collaborator = collaboratorService.requireById(request.collaboratorId());
-        Activity activity = Activity.create(request.description().trim(), collaborator);
+        Activity activity = Activity.create(request.title().trim(), request.description().trim(), collaborator);
         return ActivityResponse.from(activityRepository.save(activity));
     }
 
@@ -70,7 +70,7 @@ public class ActivityService {
     @Transactional
     public ActivityResponse updateDescription(UUID id, JsonNode body) {
         Activity activity = requireById(id);
-        activity.updateDescription(UpdateActivityRequest.descriptionFrom(body));
+        UpdateActivityRequest.from(body).applyTo(activity);
         return ActivityResponse.from(activityRepository.save(activity));
     }
 
