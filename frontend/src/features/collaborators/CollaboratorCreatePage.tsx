@@ -12,7 +12,7 @@ export function CollaboratorCreatePage() {
       </p>
       <h1>Novo colaborador</h1>
       <p className={styles.hint}>O salário é digitado em reais e enviado à API como número (ex.: 1234.56).</p>
-      <CollaboratorForm onCreated={() => navigate('/')} />
+      <CollaboratorForm onCreated={(id) => navigate(`/collaborators/${id}`)} />
     </section>
   )
 }

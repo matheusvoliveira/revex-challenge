@@ -6,7 +6,8 @@
 }
 
 .primaryLink,
-.form button {
+.form button,
+.filter button {
   display: inline-block;
   padding: 0.5rem 0.85rem;
   border: 0;
@@ -17,10 +18,28 @@
   cursor: pointer;
 }
 
-.form {
+.filter .secondary {
+  background: #555;
+}
+
+.form,
+.detail {
   display: grid;
   gap: 0.85rem;
   margin-top: 1rem;
+}
+
+.filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.filter label {
+  display: grid;
+  gap: 0.35rem;
 }
 
 .field {
@@ -28,7 +47,8 @@
   gap: 0.35rem;
 }
 
-.field input {
+.field input,
+.filter input {
   padding: 0.5rem 0.6rem;
   border: 1px solid #bbb;
   border-radius: 6px;
@@ -61,4 +81,21 @@
   padding: 0.65rem 0.75rem;
   border-bottom: 1px solid #e3e3e3;
   text-align: left;
+}
+
+.table tbody tr {
+  cursor: pointer;
+}
+
+.table tbody tr:hover {
+  background: #eef6f2;
+}
+
+.detail dt {
+  font-weight: 600;
+  margin-top: 0.75rem;
+}
+
+.detail dd {
+  margin: 0.25rem 0 0;
 }
