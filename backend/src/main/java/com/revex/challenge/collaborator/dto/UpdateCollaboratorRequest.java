@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record CreateCollaboratorRequest(
+public record UpdateCollaboratorRequest(
         @NotBlank(message = "Nome completo é obrigatório.")
         @Size(max = 60, message = "Nome completo excede o limite de 60 caracteres.")
         String fullName,

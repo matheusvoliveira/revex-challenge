@@ -2,6 +2,7 @@ package com.revex.challenge.collaborator;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -17,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -28,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@WithMockUser(username = "revex")
 class CollaboratorApiIntegrationTest {
 
     @Autowired
@@ -87,6 +91,26 @@ class CollaboratorApiIntegrationTest {
                 .andExpect(jsonPath("$.content[?(@.fullName == 'Carlos TI')]", hasSize(1)))
                 .andExpect(jsonPath("$.content[?(@.fullName == 'Paula RH')]", hasSize(0)))
                 .andExpect(jsonPath("$.totalElements").isNumber());
+    }
+
+    @Test
+    void update_changesPersistedFields() throws Exception {
+        MvcResult created = mockMvc.perform(post("/api/collaborators")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validBody("Ana Silva", "TI"))))
+                .andExpect(status().isCreated())
+                .andReturn();
+        String id = objectMapper.readTree(created.getResponse().getContentAsString()).get("id").asText();
+
+        Map<String, Object> update = new HashMap<>(validBody("Ana Costa", "RH"));
+        update.put("jobTitle", "Dev");
+        mockMvc.perform(patch("/api/collaborators/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(update)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fullName").value("Ana Costa"))
+                .andExpect(jsonPath("$.jobTitle").value("Dev"))
+                .andExpect(jsonPath("$.department").value("RH"));
     }
 
     private Map<String, Object> validBody(String fullName, String department) {

@@ -1,28 +1,46 @@
 import { useState, type FormEvent } from 'react'
 import { ApiError } from '../../shared/api/client'
 import { maskSalaryInput, parseSalaryMask } from '../../shared/format/currency'
-import { createCollaborator } from './api'
+import { Banner } from '../../shared/ui/Banner'
+import { Button } from '../../shared/ui/Button'
+import { Card } from '../../shared/ui/Card'
+import { TextField } from '../../shared/ui/TextField'
+import { createCollaborator, updateCollaborator } from './api'
 import type { CollaboratorFormValues } from './types'
-import { validateCollaboratorForm, type FormErrors } from './validate'
+import { clampAdmissionDate, todayIso, validateCollaboratorForm, type FormErrors } from './validate'
 import styles from './collaborators.module.css'
 
 type Props = {
-  onCreated: (id: string) => void
+  initialValues?: CollaboratorFormValues
+  collaboratorId?: string
+  submitLabel?: string
+  onSaved: (id: string) => void
 }
 
-const emptyValues: CollaboratorFormValues = {
-  fullName: '',
-  jobTitle: '',
-  department: '',
-  admissionDate: '',
-  salaryMask: '',
+function emptyValues(): CollaboratorFormValues {
+  return {
+    fullName: '',
+    jobTitle: '',
+    department: '',
+    admissionDate: todayIso(),
+    salaryMask: '',
+  }
 }
 
-export function CollaboratorForm({ onCreated }: Props) {
-  const [values, setValues] = useState<CollaboratorFormValues>(emptyValues)
+export function CollaboratorForm({
+  initialValues,
+  collaboratorId,
+  submitLabel = 'Cadastrar colaborador',
+  onSaved,
+}: Props) {
+  const [values, setValues] = useState<CollaboratorFormValues>(() => {
+    const seed = initialValues ?? emptyValues()
+    return { ...seed, admissionDate: clampAdmissionDate(seed.admissionDate) }
+  })
   const [errors, setErrors] = useState<FormErrors>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const admissionDate = clampAdmissionDate(values.admissionDate)
 
   function update<K extends keyof CollaboratorFormValues>(field: K, value: CollaboratorFormValues[K]) {
     setValues((current) => ({ ...current, [field]: value }))
@@ -30,7 +48,8 @@ export function CollaboratorForm({ onCreated }: Props) {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const nextErrors = validateCollaboratorForm(values)
+    const nextValues = { ...values, admissionDate }
+    const nextErrors = validateCollaboratorForm(nextValues)
     setErrors(nextErrors)
     setSubmitError(null)
     if (Object.keys(nextErrors).length > 0) {
@@ -42,24 +61,31 @@ export function CollaboratorForm({ onCreated }: Props) {
       return
     }
 
+    const payload = {
+      fullName: values.fullName.trim(),
+      jobTitle: values.jobTitle.trim(),
+      department: values.department.trim(),
+      admissionDate,
+      salary,
+    }
+
     setSubmitting(true)
     try {
-      const created = await createCollaborator({
-        fullName: values.fullName.trim(),
-        jobTitle: values.jobTitle.trim(),
-        department: values.department.trim(),
-        admissionDate: values.admissionDate,
-        salary,
-      })
-      setValues(emptyValues)
-      onCreated(created.id)
+      const saved = collaboratorId
+        ? await updateCollaborator(collaboratorId, payload)
+        : await createCollaborator(payload)
+      if (!collaboratorId) {
+        setValues(emptyValues())
+      }
+      onSaved(saved.id)
     } catch (error) {
       if (error instanceof ApiError) {
         const mapped: FormErrors = {}
+        const fields = emptyValues()
         for (const fieldError of error.fieldErrors) {
           if (fieldError.field === 'salary') {
             mapped.salaryMask = fieldError.message
-          } else if (fieldError.field in emptyValues) {
+          } else if (fieldError.field in fields) {
             mapped[fieldError.field as keyof CollaboratorFormValues] = fieldError.message
           }
         }
@@ -74,63 +100,50 @@ export function CollaboratorForm({ onCreated }: Props) {
   }
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit} noValidate>
-      <label className={styles.field}>
-        Nome completo
-        <input
+    <Card>
+      <form className={styles.form} onSubmit={handleSubmit} noValidate>
+        <TextField
+          label="Nome completo"
           value={values.fullName}
-          maxLength={255}
+          maxLength={60}
           onChange={(event) => update('fullName', event.target.value)}
+          error={errors.fullName}
         />
-        {errors.fullName ? <span className={styles.fieldError}>{errors.fullName}</span> : null}
-      </label>
-
-      <label className={styles.field}>
-        Cargo
-        <input
+        <TextField
+          label="Cargo"
           value={values.jobTitle}
-          maxLength={255}
+          maxLength={30}
           onChange={(event) => update('jobTitle', event.target.value)}
+          error={errors.jobTitle}
         />
-        {errors.jobTitle ? <span className={styles.fieldError}>{errors.jobTitle}</span> : null}
-      </label>
-
-      <label className={styles.field}>
-        Setor
-        <input
+        <TextField
+          label="Setor"
           value={values.department}
-          maxLength={255}
+          maxLength={30}
           onChange={(event) => update('department', event.target.value)}
+          error={errors.department}
         />
-        {errors.department ? <span className={styles.fieldError}>{errors.department}</span> : null}
-      </label>
-
-      <label className={styles.field}>
-        Data de admissão
-        <input
+        <TextField
+          label="Data de admissão"
           type="date"
-          value={values.admissionDate}
-          onChange={(event) => update('admissionDate', event.target.value)}
+          max={todayIso()}
+          value={admissionDate}
+          onChange={(event) => update('admissionDate', clampAdmissionDate(event.target.value))}
+          error={errors.admissionDate}
         />
-        {errors.admissionDate ? <span className={styles.fieldError}>{errors.admissionDate}</span> : null}
-      </label>
-
-      <label className={styles.field}>
-        Salário
-        <input
+        <TextField
+          label="Salário"
           inputMode="numeric"
           placeholder="R$ 0,00"
           value={values.salaryMask}
           onChange={(event) => update('salaryMask', maskSalaryInput(event.target.value))}
+          error={errors.salaryMask}
         />
-        {errors.salaryMask ? <span className={styles.fieldError}>{errors.salaryMask}</span> : null}
-      </label>
-
-      {submitError ? <p className={styles.bannerError}>{submitError}</p> : null}
-
-      <button type="submit" disabled={submitting}>
-        {submitting ? 'Salvando...' : 'Cadastrar colaborador'}
-      </button>
-    </form>
+        {submitError ? <Banner>{submitError}</Banner> : null}
+        <Button type="submit" disabled={submitting}>
+          {submitting ? 'Salvando...' : submitLabel}
+        </Button>
+      </form>
+    </Card>
   )
 }

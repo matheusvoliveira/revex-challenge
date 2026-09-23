@@ -30,3 +30,10 @@ export function createCollaborator(payload: CreateCollaboratorPayload): Promise<
     body: JSON.stringify(payload),
   })
 }
+
+export function updateCollaborator(id: string, payload: CreateCollaboratorPayload): Promise<Collaborator> {
+  return apiRequest<Collaborator>(`/api/collaborators/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+}

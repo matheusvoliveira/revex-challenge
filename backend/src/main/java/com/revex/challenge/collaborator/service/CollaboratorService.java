@@ -3,6 +3,7 @@ package com.revex.challenge.collaborator.service;
 import com.revex.challenge.collaborator.dto.CollaboratorResponse;
 import com.revex.challenge.collaborator.dto.CollaboratorSummaryResponse;
 import com.revex.challenge.collaborator.dto.CreateCollaboratorRequest;
+import com.revex.challenge.collaborator.dto.UpdateCollaboratorRequest;
 import com.revex.challenge.collaborator.entity.Collaborator;
 import com.revex.challenge.collaborator.repository.CollaboratorRepository;
 import com.revex.challenge.shared.exception.ResourceNotFoundException;
@@ -52,6 +53,19 @@ public class CollaboratorService {
     @Transactional(readOnly = true)
     public CollaboratorResponse getById(UUID id) {
         return CollaboratorResponse.from(requireById(id));
+    }
+
+    @Transactional
+    public CollaboratorResponse update(UUID id, UpdateCollaboratorRequest request) {
+        Collaborator collaborator = requireById(id);
+        collaborator.update(
+                request.fullName().trim(),
+                request.jobTitle().trim(),
+                request.admissionDate(),
+                request.department().trim(),
+                request.salary()
+        );
+        return CollaboratorResponse.from(collaboratorRepository.save(collaborator));
     }
 
     /**

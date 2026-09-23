@@ -1,7 +1,14 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { ApiError } from '../../shared/api/client'
 import { formatSalaryNumber } from '../../shared/format/currency'
+import { Banner } from '../../shared/ui/Banner'
+import { Button } from '../../shared/ui/Button'
+import { EmptyState } from '../../shared/ui/EmptyState'
+import { PageHeader } from '../../shared/ui/PageHeader'
+import { StatusText } from '../../shared/ui/StatusText'
+import { Table } from '../../shared/ui/Table'
+import { TextField } from '../../shared/ui/TextField'
 import { listCollaborators } from './api'
 import type { CollaboratorSummary } from './types'
 import styles from './collaborators.module.css'
@@ -53,52 +60,54 @@ export function CollaboratorListPage() {
 
   return (
     <section>
-      <div className={styles.headerRow}>
-        <h1>Colaboradores</h1>
-        <Link className={styles.primaryLink} to="/collaborators/new">
-          Novo colaborador
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Pessoas"
+        title="Colaboradores"
+        description="Cadastro e consulta da equipe operacional."
+        action={<Button to="/collaborators/new">Novo colaborador</Button>}
+      />
 
       <form className={styles.filter} onSubmit={handleFilter}>
-        <label>
-          Filtrar por setor
-          <input
-            value={department}
-            placeholder="Ex.: TI"
-            onChange={(event) => setDepartment(event.target.value)}
-          />
-        </label>
-        <button type="submit">Filtrar</button>
+        <TextField
+          label="Filtrar por setor"
+          value={department}
+          placeholder="Ex.: TI"
+          onChange={(event) => setDepartment(event.target.value)}
+        />
+        <Button type="submit">Filtrar</Button>
         {appliedDepartment ? (
-          <button
+          <Button
             type="button"
-            className={styles.secondary}
+            variant="secondary"
             onClick={() => {
               setDepartment('')
               setAppliedDepartment('')
             }}
           >
             Limpar
-          </button>
+          </Button>
         ) : null}
       </form>
 
-      {loading ? <p className={styles.status}>Carregando...</p> : null}
+      {loading ? <StatusText>Carregando...</StatusText> : null}
       {error ? (
-        <p className={styles.bannerError}>
+        <Banner>
           {error}{' '}
-          <button type="button" onClick={() => setReloadKey((key) => key + 1)}>
+          <Button type="button" variant="secondary" onClick={() => setReloadKey((key) => key + 1)}>
             Tentar novamente
-          </button>
-        </p>
+          </Button>
+        </Banner>
       ) : null}
       {!loading && !error && items?.length === 0 ? (
-        <p className={styles.status}>Nenhum colaborador cadastrado.</p>
+        <EmptyState
+          title="Nenhum colaborador cadastrado."
+          description="Cadastre a primeira pessoa para começar a operar."
+          action={<Button to="/collaborators/new" variant="secondary">Novo colaborador</Button>}
+        />
       ) : null}
 
       {!loading && !error && items && items.length > 0 ? (
-        <table className={styles.table}>
+        <Table clickable>
           <thead>
             <tr>
               <th>Nome</th>
@@ -117,7 +126,7 @@ export function CollaboratorListPage() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </Table>
       ) : null}
     </section>
   )

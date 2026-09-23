@@ -3,6 +3,7 @@ package com.revex.challenge.collaborator.controller;
 import com.revex.challenge.collaborator.dto.CollaboratorResponse;
 import com.revex.challenge.collaborator.dto.CollaboratorSummaryResponse;
 import com.revex.challenge.collaborator.dto.CreateCollaboratorRequest;
+import com.revex.challenge.collaborator.dto.UpdateCollaboratorRequest;
 import com.revex.challenge.collaborator.service.CollaboratorService;
 import com.revex.challenge.shared.pagination.PageResponse;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,5 +51,13 @@ public class CollaboratorController {
     @GetMapping("/{id}")
     public CollaboratorResponse getById(@PathVariable UUID id) {
         return collaboratorService.getById(id);
+    }
+
+    @PatchMapping("/{id}")
+    public CollaboratorResponse update(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateCollaboratorRequest request
+    ) {
+        return collaboratorService.update(id, request);
     }
 }

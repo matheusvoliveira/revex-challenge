@@ -61,6 +61,23 @@ public class Collaborator {
         return collaborator;
     }
 
+    public void update(
+            String fullName,
+            String jobTitle,
+            LocalDate admissionDate,
+            String department,
+            BigDecimal salary
+    ) {
+        if (salary == null || salary.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessRuleException("Salário deve ser positivo.");
+        }
+        this.fullName = fullName;
+        this.jobTitle = jobTitle;
+        this.admissionDate = admissionDate;
+        this.department = department;
+        this.salary = salary;
+    }
+
     public UUID getId() {
         return id;
     }
