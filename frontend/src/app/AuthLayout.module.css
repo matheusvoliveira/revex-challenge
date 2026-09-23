@@ -7,12 +7,16 @@
 
 .panel {
   display: grid;
-  gap: 1.5rem;
+  gap: 1.25rem;
   width: min(24rem, 100%);
 }
 
-.brand {
-  justify-self: center;
+.hero {
+  display: grid;
+  place-items: center;
+  padding: 1.4rem 1.2rem;
+  border-radius: 14px;
+  background: var(--revex-indigo);
 }
 
 .card {
@@ -24,10 +28,5 @@
 }
 
 .foot {
-  margin: 0;
-  color: var(--revex-muted);
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-align: center;
-  text-transform: uppercase;
+  justify-self: center;
 }

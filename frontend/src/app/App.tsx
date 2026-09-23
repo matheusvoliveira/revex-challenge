@@ -7,6 +7,7 @@ import { getToken } from '../features/auth/token'
 import { CollaboratorCreatePage } from '../features/collaborators/CollaboratorCreatePage'
 import { CollaboratorDetailPage } from '../features/collaborators/CollaboratorDetailPage'
 import { CollaboratorListPage } from '../features/collaborators/CollaboratorListPage'
+import { DashboardPage } from '../features/dashboard/DashboardPage'
 import { AppChrome } from './AppChrome'
 import { AuthLayout } from './AuthLayout'
 
@@ -35,7 +36,7 @@ export function App() {
           </RequireAuth>
         )}
       >
-        <Route path="/" element={<CollaboratorListPage />} />
+        <Route path="/" element={<DashboardPage />} />
         <Route path="/collaborators" element={<CollaboratorListPage />} />
         <Route path="/collaborators/new" element={<CollaboratorCreatePage />} />
         <Route path="/collaborators/:id" element={<CollaboratorDetailPage />} />

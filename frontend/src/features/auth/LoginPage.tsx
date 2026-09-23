@@ -1,6 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ApiError } from '../../shared/api/client'
+import { Banner } from '../../shared/ui/Banner'
+import { Button } from '../../shared/ui/Button'
+import { TextField } from '../../shared/ui/TextField'
 import { login } from './api'
 import { setToken } from './token'
 import styles from './login.module.css'
@@ -40,25 +43,24 @@ export function LoginPage() {
 
   return (
     <section>
-      <h1>Entrar</h1>
+      <h1 className={styles.title}>Entrar</h1>
       <p className={styles.hint}>Usuário de demonstração: revex / revex</p>
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
-        <label className={styles.field}>
-          Usuário
-          <input value={username} onChange={(event) => setUsername(event.target.value)} />
-        </label>
-        <label className={styles.field}>
-          Senha
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </label>
-        {error ? <p className={styles.bannerError}>{error}</p> : null}
-        <button type="submit" disabled={submitting}>
+        <TextField
+          label="Usuário"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+        />
+        <TextField
+          label="Senha"
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+        {error ? <Banner>{error}</Banner> : null}
+        <Button type="submit" disabled={submitting}>
           {submitting ? 'Entrando...' : 'Entrar'}
-        </button>
+        </Button>
       </form>
     </section>
   )

@@ -1,35 +1,16 @@
-.form {
-  display: grid;
-  gap: 0.85rem;
-  max-width: 22rem;
-  margin-top: 1rem;
-}
-
-.field {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.field input {
-  padding: 0.5rem 0.6rem;
-  border: 1px solid #bbb;
-  border-radius: 6px;
-  font: inherit;
-}
-
-.form button {
-  padding: 0.5rem 0.85rem;
-  border: 0;
-  border-radius: 6px;
-  background: #1f4b3a;
-  color: #fff;
-  cursor: pointer;
-}
-
-.bannerError {
-  color: #9b1c1c;
+.title {
+  margin: 0 0 0.35rem;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
 .hint {
-  color: #444;
+  margin: 0 0 1.15rem;
+  color: var(--revex-muted);
+}
+
+.form {
+  display: grid;
+  gap: 0.9rem;
 }

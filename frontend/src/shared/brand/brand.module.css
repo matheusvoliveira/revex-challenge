@@ -1,15 +1,26 @@
-.mark {
-  display: inline-block;
-  color: var(--revex-accent);
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  line-height: 1;
+.combo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
 }
 
-.compact {
-  font-size: 1rem;
-  letter-spacing: 0.14em;
+.icon {
+  width: 1.7rem;
+  height: 1.7rem;
+  object-fit: contain;
+}
+
+.name {
+  color: var(--revex-text);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.wordmark {
+  display: block;
+  width: min(11rem, 70vw);
+  height: auto;
 }
 
 .link {

@@ -10,11 +10,10 @@ export function AuthLayout({ children }: Props) {
   return (
     <div className={styles.shell}>
       <div className={styles.panel}>
-        <div className={styles.brand}>
-          <BrandMark />
+        <div className={styles.hero}>
+          <BrandMark variant="wordmark" />
         </div>
         <div className={styles.card}>{children}</div>
-        <p className={styles.foot}>Revex</p>
       </div>
     </div>
   )
