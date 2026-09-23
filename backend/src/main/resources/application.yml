@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: revex-challenge
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/revex}
+    username: ${SPRING_DATASOURCE_USERNAME:revex}
+    password: ${SPRING_DATASOURCE_PASSWORD:revex}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: ${SERVER_PORT:8080}
