@@ -7,6 +7,7 @@ import com.revex.challenge.activity.entity.ActivityStatus;
 import com.revex.challenge.activity.repository.ActivityRepository;
 import com.revex.challenge.collaborator.entity.Collaborator;
 import com.revex.challenge.collaborator.service.CollaboratorService;
+import com.revex.challenge.shared.exception.ResourceNotFoundException;
 import com.revex.challenge.shared.pagination.PageResponse;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -48,5 +49,24 @@ public class ActivityService {
             result = activityRepository.findAll(pageable);
         }
         return PageResponse.from(result.map(ActivityResponse::from));
+    }
+
+    @Transactional
+    public ActivityResponse start(UUID id) {
+        Activity activity = requireById(id);
+        activity.start();
+        return ActivityResponse.from(activityRepository.save(activity));
+    }
+
+    @Transactional
+    public ActivityResponse complete(UUID id) {
+        Activity activity = requireById(id);
+        activity.complete();
+        return ActivityResponse.from(activityRepository.save(activity));
+    }
+
+    private Activity requireById(UUID id) {
+        return activityRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Atividade não encontrada."));
     }
 }

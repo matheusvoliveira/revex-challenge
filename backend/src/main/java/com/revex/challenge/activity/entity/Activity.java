@@ -1,6 +1,7 @@
 package com.revex.challenge.activity.entity;
 
 import com.revex.challenge.collaborator.entity.Collaborator;
+import com.revex.challenge.shared.exception.BusinessRuleException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -46,6 +47,20 @@ public class Activity {
         activity.status = ActivityStatus.PENDENTE;
         activity.createdAt = Instant.now();
         return activity;
+    }
+
+    public void start() {
+        if (status != ActivityStatus.PENDENTE) {
+            throw new BusinessRuleException("Só é possível iniciar uma atividade pendente.");
+        }
+        this.status = ActivityStatus.EM_ANDAMENTO;
+    }
+
+    public void complete() {
+        if (status == ActivityStatus.CONCLUIDA) {
+            throw new BusinessRuleException("Não é possível concluir uma atividade já concluída.");
+        }
+        this.status = ActivityStatus.CONCLUIDA;
     }
 
     public UUID getId() {
