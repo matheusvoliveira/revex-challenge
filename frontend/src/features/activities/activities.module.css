@@ -6,7 +6,9 @@
 }
 
 .primaryLink,
-.form button {
+.form button,
+.filter button,
+.actions button {
   display: inline-block;
   padding: 0.5rem 0.85rem;
   border: 0;
@@ -17,10 +19,28 @@
   cursor: pointer;
 }
 
+.filter .secondary,
+.actions .secondary {
+  background: #555;
+}
+
 .form {
   display: grid;
   gap: 0.85rem;
   margin-top: 1rem;
+}
+
+.filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.filter label {
+  display: grid;
+  gap: 0.35rem;
 }
 
 .field {
@@ -30,7 +50,9 @@
 
 .field input,
 .field textarea,
-.field select {
+.field select,
+.filter input,
+.filter select {
   padding: 0.5rem 0.6rem;
   border: 1px solid #bbb;
   border-radius: 6px;
@@ -64,4 +86,33 @@
   border-bottom: 1px solid #e3e3e3;
   text-align: left;
   vertical-align: top;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.PENDENTE {
+  background: #f3e6c6;
+  color: #6a4b00;
+}
+
+.EM_ANDAMENTO {
+  background: #d6e7f7;
+  color: #184f80;
+}
+
+.CONCLUIDA {
+  background: #d7efe3;
+  color: #1f4b3a;
 }
