@@ -1,0 +1,32 @@
+# Serena / IDE
+.serena/
+.idea/
+.vscode/
+*.iml
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Java / Maven / Gradle
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+.mvn/wrapper/maven-wrapper.jar
+.gradle/
+
+# Node
+node_modules/
+dist/
+coverage/
+.turbo/
+.next/
+
+# OS / logs
+.DS_Store
+*.log
+*.tmp
