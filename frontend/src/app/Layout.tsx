@@ -15,7 +15,7 @@ export function Layout({ children }: Props) {
         </Link>
         <nav>
           <Link to="/">Colaboradores</Link>
-          <Link to="/collaborators/new">Novo</Link>
+          <Link to="/activities">Atividades</Link>
         </nav>
       </header>
       <main className={styles.main}>{children}</main>
