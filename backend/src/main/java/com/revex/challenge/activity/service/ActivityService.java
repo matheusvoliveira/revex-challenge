@@ -1,7 +1,9 @@
 package com.revex.challenge.activity.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.revex.challenge.activity.dto.ActivityResponse;
 import com.revex.challenge.activity.dto.CreateActivityRequest;
+import com.revex.challenge.activity.dto.UpdateActivityRequest;
 import com.revex.challenge.activity.entity.Activity;
 import com.revex.challenge.activity.entity.ActivityStatus;
 import com.revex.challenge.activity.repository.ActivityRepository;
@@ -62,6 +64,13 @@ public class ActivityService {
     public ActivityResponse complete(UUID id) {
         Activity activity = requireById(id);
         activity.complete();
+        return ActivityResponse.from(activityRepository.save(activity));
+    }
+
+    @Transactional
+    public ActivityResponse updateDescription(UUID id, JsonNode body) {
+        Activity activity = requireById(id);
+        activity.updateDescription(UpdateActivityRequest.descriptionFrom(body));
         return ActivityResponse.from(activityRepository.save(activity));
     }
 

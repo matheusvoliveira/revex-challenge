@@ -17,3 +17,7 @@ export function validateActivityForm(values: ActivityFormValues): ActivityFormEr
 
   return errors
 }
+
+export function validateActivityDescription(description: string): string | null {
+  return validateActivityForm({ description, collaboratorId: 'ok' }).description ?? null
+}

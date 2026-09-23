@@ -1,5 +1,6 @@
 package com.revex.challenge.activity.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.revex.challenge.activity.dto.ActivityResponse;
 import com.revex.challenge.activity.dto.CreateActivityRequest;
 import com.revex.challenge.activity.entity.ActivityStatus;
@@ -56,5 +57,10 @@ public class ActivityController {
     @PatchMapping("/{id}/complete")
     public ActivityResponse complete(@PathVariable UUID id) {
         return activityService.complete(id);
+    }
+
+    @PatchMapping("/{id}")
+    public ActivityResponse updateDescription(@PathVariable UUID id, @RequestBody JsonNode body) {
+        return activityService.updateDescription(id, body);
     }
 }

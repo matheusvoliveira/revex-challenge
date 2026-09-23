@@ -94,6 +94,19 @@
   gap: 0.4rem;
 }
 
+.editBox {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.editBox textarea {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  font: inherit;
+}
+
 .badge {
   display: inline-block;
   padding: 0.2rem 0.55rem;

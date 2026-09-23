@@ -46,6 +46,13 @@ public class GlobalExceptionHandler {
                 .body(ApiErrorResponse.of(400, "Dados inválidos.", fieldErrors));
     }
 
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidRequest(InvalidRequestException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.of(400, exception.getMessage(), exception.getFieldErrors()));
+    }
+
     @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class})
     public ResponseEntity<ApiErrorResponse> handleBadRequest(Exception exception) {
         log.debug("Requisição ilegível ou tipo inválido: {}", exception.getMessage());

@@ -63,6 +63,10 @@ public class Activity {
         this.status = ActivityStatus.CONCLUIDA;
     }
 
+    public void updateDescription(String description) {
+        this.description = description;
+    }
+
     public UUID getId() {
         return id;
     }

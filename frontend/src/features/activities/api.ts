@@ -39,3 +39,10 @@ export function startActivity(id: string): Promise<Activity> {
 export function completeActivity(id: string): Promise<Activity> {
   return apiRequest<Activity>(`/api/activities/${id}/complete`, { method: 'PATCH' })
 }
+
+export function updateActivity(id: string, description: string): Promise<Activity> {
+  return apiRequest<Activity>(`/api/activities/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ description }),
+  })
+}
