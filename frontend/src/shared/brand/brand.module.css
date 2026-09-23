@@ -1,0 +1,18 @@
+.mark {
+  display: inline-block;
+  color: var(--revex-accent);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1;
+}
+
+.compact {
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+}
+
+.link {
+  color: inherit;
+  text-decoration: none;
+}

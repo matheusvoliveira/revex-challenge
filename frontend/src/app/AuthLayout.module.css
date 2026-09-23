@@ -1,0 +1,33 @@
+.shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.panel {
+  display: grid;
+  gap: 1.5rem;
+  width: min(24rem, 100%);
+}
+
+.brand {
+  justify-self: center;
+}
+
+.card {
+  padding: 1.6rem 1.5rem 1.5rem;
+  border: 1px solid var(--revex-border);
+  border-radius: 14px;
+  background: var(--revex-surface);
+  box-shadow: var(--revex-shadow);
+}
+
+.foot {
+  margin: 0;
+  color: var(--revex-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}

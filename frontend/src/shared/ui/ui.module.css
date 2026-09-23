@@ -1,0 +1,255 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.35rem;
+  padding: 0.45rem 0.95rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--revex-accent);
+  color: #fff;
+}
+
+.primary:hover:not(:disabled) {
+  background: #2424e0;
+}
+
+.secondary {
+  background: var(--revex-surface);
+  color: var(--revex-text);
+  border-color: var(--revex-border);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--revex-hover);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--revex-muted);
+}
+
+.ghost:hover:not(:disabled) {
+  color: var(--revex-text);
+  background: var(--revex-hover);
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.fieldLabel {
+  color: var(--revex-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.control {
+  width: 100%;
+  min-height: 2.45rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--revex-border);
+  border-radius: 8px;
+  background: var(--revex-surface);
+  color: var(--revex-text);
+}
+
+.control:focus {
+  border-color: var(--revex-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--revex-accent-soft);
+}
+
+.area {
+  min-height: 6.5rem;
+  resize: vertical;
+}
+
+.fieldError {
+  color: var(--revex-red);
+  font-size: 0.82rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.pending {
+  background: #f8ebe3;
+  color: var(--revex-orange);
+}
+
+.progress {
+  background: #e6f5f9;
+  color: #217a93;
+}
+
+.done {
+  background: #e5f6ec;
+  color: var(--revex-green);
+}
+
+.neutral {
+  background: var(--revex-hover);
+  color: var(--revex-muted);
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--revex-border);
+  border-radius: var(--revex-radius);
+  background: var(--revex-surface);
+  box-shadow: var(--revex-shadow);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.8rem 0.95rem;
+  border-bottom: 1px solid var(--revex-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  color: var(--revex-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: #f8f8fb;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.clickable tbody tr {
+  cursor: pointer;
+}
+
+.clickable tbody tr:hover {
+  background: var(--revex-hover);
+}
+
+.card {
+  padding: 1.15rem 1.2rem;
+  border: 1px solid var(--revex-border);
+  border-radius: var(--revex-radius);
+  background: var(--revex-surface);
+  box-shadow: var(--revex-shadow);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.pageCopy {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--revex-indigo);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.pageDescription {
+  margin: 0;
+  color: var(--revex-muted);
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+}
+
+.bannerError {
+  background: #fdecea;
+  color: #9a2b26;
+}
+
+.bannerInfo {
+  background: #e8f6fa;
+  color: #1f5f70;
+}
+
+.empty {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: start;
+  padding: 2rem 1.25rem;
+  border: 1px dashed var(--revex-border);
+  border-radius: var(--revex-radius);
+  background: var(--revex-surface);
+  color: var(--revex-muted);
+}
+
+.emptyTitle {
+  margin: 0;
+  color: var(--revex-text);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.emptyText {
+  margin: 0;
+}
+
+.status {
+  margin: 0 0 1rem;
+  color: var(--revex-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}

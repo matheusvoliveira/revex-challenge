@@ -7,7 +7,8 @@ import { getToken } from '../features/auth/token'
 import { CollaboratorCreatePage } from '../features/collaborators/CollaboratorCreatePage'
 import { CollaboratorDetailPage } from '../features/collaborators/CollaboratorDetailPage'
 import { CollaboratorListPage } from '../features/collaborators/CollaboratorListPage'
-import { Layout } from './Layout'
+import { AppChrome } from './AppChrome'
+import { AuthLayout } from './AuthLayout'
 
 function RequireAuth({ children }: { children: ReactNode }) {
   if (!getToken()) {
@@ -18,51 +19,30 @@ function RequireAuth({ children }: { children: ReactNode }) {
 
 export function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/"
-          element={(
-            <RequireAuth>
-              <CollaboratorListPage />
-            </RequireAuth>
-          )}
-        />
-        <Route
-          path="/collaborators/new"
-          element={(
-            <RequireAuth>
-              <CollaboratorCreatePage />
-            </RequireAuth>
-          )}
-        />
-        <Route
-          path="/collaborators/:id"
-          element={(
-            <RequireAuth>
-              <CollaboratorDetailPage />
-            </RequireAuth>
-          )}
-        />
-        <Route
-          path="/activities"
-          element={(
-            <RequireAuth>
-              <ActivityListPage />
-            </RequireAuth>
-          )}
-        />
-        <Route
-          path="/activities/new"
-          element={(
-            <RequireAuth>
-              <ActivityCreatePage />
-            </RequireAuth>
-          )}
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Layout>
+    <Routes>
+      <Route
+        path="/login"
+        element={(
+          <AuthLayout>
+            <LoginPage />
+          </AuthLayout>
+        )}
+      />
+      <Route
+        element={(
+          <RequireAuth>
+            <AppChrome />
+          </RequireAuth>
+        )}
+      >
+        <Route path="/" element={<CollaboratorListPage />} />
+        <Route path="/collaborators" element={<CollaboratorListPage />} />
+        <Route path="/collaborators/new" element={<CollaboratorCreatePage />} />
+        <Route path="/collaborators/:id" element={<CollaboratorDetailPage />} />
+        <Route path="/activities" element={<ActivityListPage />} />
+        <Route path="/activities/new" element={<ActivityCreatePage />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
