@@ -61,6 +61,13 @@ public class GlobalExceptionHandler {
                 .body(ApiErrorResponse.of(400, "Requisição inválida."));
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiErrorResponse> handleUnauthorized(UnauthorizedException exception) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiErrorResponse.of(401, exception.getMessage()));
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFound(ResourceNotFoundException exception) {
         return ResponseEntity

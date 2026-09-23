@@ -46,3 +46,5 @@ Testes de domínio entram nas Sprints 1+. Sem H2.
 ## Variáveis
 
 Ver `.env.example`. Padrão local: banco `revex` / usuário `revex` / senha `revex`.
+
+JWT (S6): `JWT_SECRET` e `JWT_EXPIRATION_SECONDS`. Login de demonstração: usuário `revex`, senha `revex`. A senha no banco é só hash BCrypt.

@@ -23,6 +23,16 @@
   text-decoration: none;
 }
 
+.logout {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .main {
   max-width: 64rem;
   margin: 0 auto;

@@ -1,3 +1,5 @@
+import { clearToken, getToken } from '../../features/auth/token'
+
 export type FieldError = {
   field: string
   message: string
@@ -25,12 +27,23 @@ export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T
   if (init?.body && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
   }
+  const token = getToken()
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`)
+  }
 
   let response: Response
   try {
     response = await fetch(path, { ...init, headers })
   } catch {
     throw new ApiError('Não foi possível conectar à API. Verifique se o backend está no ar.', 0)
+  }
+
+  if (response.status === 401 && !path.startsWith('/api/auth/login')) {
+    clearToken()
+    if (window.location.pathname !== '/login') {
+      window.location.assign('/login')
+    }
   }
 
   if (!response.ok) {
