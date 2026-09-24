@@ -97,6 +97,18 @@ class AuthApiIntegrationTest {
                 .andExpect(jsonPath("$.content").isArray());
     }
 
+    @Test
+    void login_ignoresStaleBearerAndAuthenticates() throws Exception {
+        String expired = jwtService.createToken("revex", Instant.now().minusSeconds(5));
+
+        mockMvc.perform(post("/api/auth/login")
+                        .header("Authorization", "Bearer " + expired)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of("username", "revex", "password", "revex"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").isNotEmpty());
+    }
+
     private String loginToken() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -27,8 +27,9 @@ export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T
   if (init?.body && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
   }
+  const isLogin = path.startsWith('/api/auth/login')
   const token = getToken()
-  if (token && !headers.has('Authorization')) {
+  if (token && !isLogin && !headers.has('Authorization')) {
     headers.set('Authorization', `Bearer ${token}`)
   }
 
@@ -39,9 +40,9 @@ export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T
     throw new ApiError('Não foi possível conectar à API. Verifique se o backend está no ar.', 0)
   }
 
-  if (response.status === 401 && !path.startsWith('/api/auth/login')) {
+  if (response.status === 401) {
     clearToken()
-    if (window.location.pathname !== '/login') {
+    if (!isLogin && window.location.pathname !== '/login') {
       window.location.assign('/login')
     }
   }
