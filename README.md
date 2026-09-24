@@ -85,9 +85,11 @@ Ou, utilizando Docker:
 ```bash
 docker compose up -d db
 
-docker run --rm --network host \
-  -v "$PWD/backend":/app \
-  -w /app \
+docker run --rm --network revex-challenge_default \
+  -e SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/revex \
+  -e SPRING_DATASOURCE_USERNAME=revex \
+  -e SPRING_DATASOURCE_PASSWORD=revex \
+  -v "$PWD/backend":/app -w /app \
   maven:3.9-eclipse-temurin-21 \
   mvn test
 ```
