@@ -5,7 +5,7 @@ Desafio técnico Full Stack para a Revex, desenvolvido com **Java/Spring Boot + 
 ## Stack
 
 - Java 21
-- Spring Boot
+- Spring Boot 3.5
 - Spring Security + JWT
 - React + TypeScript + Vite
 - PostgreSQL 16
@@ -24,16 +24,22 @@ cd revex-challenge
 
 ### 2. Subir a aplicação
 
-O projeto pode ser executado completamente com Docker:
+A aplicação pode ser executada completamente com Docker, sem necessidade de instalar Java, Maven ou Node.js no ambiente local.
 
 ```bash
 docker compose up --build
 ```
 
-Após a inicialização, acesse:
+Após os serviços iniciarem, acesse:
 
 ```text
 http://localhost:3000
+```
+
+Para verificar o status dos containers:
+
+```bash
+docker compose ps
 ```
 
 Credenciais de demonstração:
@@ -43,27 +49,27 @@ Usuário: revex
 Senha: revex
 ```
 
-A aplicação é composta por:
+### Arquitetura de execução
 
 ```text
 Browser
    ↓
-Nginx :3000
+Nginx
    ↓
-Spring Boot :8080
+Spring Boot
    ↓
-PostgreSQL :5432
+PostgreSQL
 ```
 
-As portas do backend e do banco ficam disponíveis apenas dentro da rede Docker.
+A aplicação publica somente a porta `3000` no host. O backend e o banco permanecem na rede interna do Docker.
 
-Para parar:
+Para parar a aplicação:
 
 ```bash
 docker compose down
 ```
 
-Para remover também os dados do banco:
+Para remover também os dados persistidos:
 
 ```bash
 docker compose down -v
@@ -73,23 +79,20 @@ docker compose down -v
 
 ### Backend
 
-Com Java 21 e Maven instalados:
+Os testes do backend incluem testes unitários e de integração.
 
-```bash
-cd backend
-mvn test
-```
-
-Ou, utilizando Docker:
+Com Docker:
 
 ```bash
 docker compose up -d db
 
-docker run --rm --network revex-challenge_default \
+docker run --rm \
+  --network revex-challenge_default \
   -e SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/revex \
   -e SPRING_DATASOURCE_USERNAME=revex \
   -e SPRING_DATASOURCE_PASSWORD=revex \
-  -v "$PWD/backend":/app -w /app \
+  -v "$PWD/backend":/app \
+  -w /app \
   maven:3.9-eclipse-temurin-21 \
   mvn test
 ```
@@ -106,62 +109,83 @@ npm test
 
 ## Funcionalidades
 
+### Autenticação
+
+- Login com JWT.
+- Autenticação stateless.
+- Proteção das rotas da API.
+- Sessão mantida no `sessionStorage`.
+
+### Dashboard
+
+- Resumo de colaboradores e atividades.
+- Indicadores por status.
+- Lista de atividades recentes.
+
 ### Colaboradores
 
-- Cadastro
-- Listagem
-- Filtro por departamento
-- Visualização dos dados
-- Validação dos campos
+- Cadastro de colaboradores.
+- Listagem e filtro por setor.
+- Visualização dos dados.
+- Edição do cadastro.
+- Validação dos campos.
 
 ### Atividades
 
-- Cadastro e associação a colaboradores
-- Listagem e filtros
-- Edição da descrição
-- Início da atividade
-- Conclusão da atividade
+- Cadastro e associação a colaboradores.
+- Listagem e filtros por colaborador e status.
+- Edição de título e descrição.
+- Início e conclusão de atividades.
 
 Fluxo de status:
 
 ```text
 PENDENTE → EM_ANDAMENTO → CONCLUIDA
+     └──────────────────→ CONCLUIDA
 ```
 
-### Autenticação
-
-A aplicação utiliza autenticação stateless com JWT.
+Atividades concluídas podem ter seus dados textuais editados sem alterar seu status.
 
 ## Arquitetura
 
-O backend utiliza uma arquitetura de **monólito modular**, separando os principais domínios da aplicação:
+O backend utiliza um **monólito modular**, organizado por domínio:
 
 ```text
-backend/
+backend/src/main/java/com/revex/challenge/
 ├── activity/
 ├── auth/
 ├── collaborator/
 └── shared/
 ```
 
-A escolha por um monólito modular foi intencional: o escopo do desafio não justifica a complexidade de uma arquitetura distribuída.
+A escolha busca manter os limites entre os domínios sem adicionar complexidade distribuída desnecessária para o contexto do desafio.
 
-No frontend, a aplicação é organizada por funcionalidades e componentes compartilhados.
+O frontend segue uma organização por funcionalidades:
+
+```text
+frontend/src/
+├── features/
+│   ├── auth/
+│   ├── collaborators/
+│   ├── activities/
+│   └── dashboard/
+└── shared/
+```
 
 ## Estrutura
 
 ```text
 revex-challenge/
-├── backend/          # API Spring Boot
-├── frontend/         # Aplicação React
-├── docs/             # Planejamento e documentação
-├── docker-compose.yml
-├── .env.example
+├── backend/            # API Spring Boot
+├── frontend/           # Aplicação React
+├── docs/               # Planejamento
+├── docker-compose.yml  # Ambiente completo
+├── .env.example        # Variáveis de ambiente
 └── README.md
 ```
 
 ## Escopo
 
-O projeto prioriza a resolução do problema apresentado no desafio, mantendo a implementação pequena e coerente com o contexto.
+O projeto foi desenvolvido buscando manter uma implementação objetiva e coerente com o problema apresentado no desafio.
 
-Recursos como RBAC, recuperação de senha, microsserviços, filas e Kubernetes não fazem parte do escopo atual.
+Funcionalidades adicionais como RBAC, recuperação de senha, cadastro de usuários, microsserviços, filas e Kubernetes não fazem parte do escopo atual.
